@@ -22,7 +22,7 @@ export async function run() {
   const RESULTS_FILE = join(CWD, "jest.results.json")
   const relativeReport = getReportFile()
   const REPORT_FILE = relativeReport ? join(CWD, relativeReport) : relativeReport;
-  core.error('Report file is: ' + relativeReport)
+  core.info('Report file is: ' + relativeReport)
 
   try {
     const token = process.env.GITHUB_TOKEN
