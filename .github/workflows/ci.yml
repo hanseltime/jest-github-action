@@ -27,3 +27,7 @@ jobs:
       - uses: ./
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEBUG: ${{ secrets.ACTIONS_RUNNER_DEBUG }}
+        with:
+          test-command: "npm run failing-test"
+          test-report: "jest_html_reporters.html"
