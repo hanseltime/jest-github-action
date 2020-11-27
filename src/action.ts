@@ -143,7 +143,7 @@ function getCheckPayload(results: FormattedTestResults, cwd: string, reportFile:
     status: "completed",
     conclusion: results.success ? "success" : "failure",
     output: {
-      title: results.success ? "Jest tests passed" : "Jest tests failed",
+      title: results.success ? "Jest tests passed" : "Jest tests failed" + "\n Report File:" + getReportFile(),
       text: text + "\n Report File:" + getReportFile(),
       summary: results.success
         ? `${results.numPassedTests} tests passing in ${
