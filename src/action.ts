@@ -23,6 +23,7 @@ export async function run() {
   const relativeReport = getReportFile()
   const REPORT_FILE = relativeReport ? join(CWD, relativeReport) : relativeReport;
   core.info('Report file is: ' + relativeReport)
+  core.info('Report absolute is: ' + REPORT_FILE);
 
   try {
     const token = process.env.GITHUB_TOKEN
@@ -132,8 +133,10 @@ function getCheckPayload(results: FormattedTestResults, cwd: string, reportFile:
   if (reportFile) {
     // TODO: add parsing of reportFile to make it markdown compliant
     text = readFileSync(reportFile, "utf-8")
+    console.log('The text was retrieved from reportFile: ' + text)
   } else {
     text = getOutputText(results)
+    console.log('The results were retrieved from standard')
   }
 
   const payload: Octokit.ChecksCreateParams = {
@@ -143,8 +146,8 @@ function getCheckPayload(results: FormattedTestResults, cwd: string, reportFile:
     status: "completed",
     conclusion: results.success ? "success" : "failure",
     output: {
-      title: results.success ? "Jest tests passed" : "Jest tests failed" + "\n Report File:" + getReportFile(),
-      text: text + "\n New Report File:" + getReportFile(),
+      title: results.success ? "Jest tests passed" : "Jest tests failed",
+      text: text,
       summary: results.success
         ? `${results.numPassedTests} tests passing in ${
             results.numPassedTestSuites
