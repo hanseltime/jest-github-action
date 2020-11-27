@@ -20,6 +20,10 @@ inputs:
     description: "Only run tests on changed files (over base branch)"
     required: false
     default: "false"
+  test-report:
+    description: "Supplemental test report to display - must be html/markdown compliant output"
+    requires: false
+    default: ""
 
 runs:
   using: "node12"

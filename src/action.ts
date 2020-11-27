@@ -20,6 +20,9 @@ export async function run() {
   let cwd = workingDirectory ? resolve(workingDirectory) : process.cwd()
   const CWD = cwd + sep
   const RESULTS_FILE = join(CWD, "jest.results.json")
+  const relativeReport = getReportFile()
+  const REPORT_FILE = relativeReport ? join(CWD, relativeReport) : relativeReport;
+  core.info('Report file is: ' + relativeReport)
 
   try {
     const token = process.env.GITHUB_TOKEN
@@ -40,7 +43,7 @@ export async function run() {
     const results = parseResults(RESULTS_FILE)
 
     // Checks
-    const checkPayload = getCheckPayload(results, CWD)
+    const checkPayload = getCheckPayload(results, CWD, REPORT_FILE)
     await octokit.checks.create(checkPayload)
 
     // Coverage comments
@@ -124,7 +127,15 @@ function getCommentPayload(body: string) {
   return payload
 }
 
-function getCheckPayload(results: FormattedTestResults, cwd: string) {
+function getCheckPayload(results: FormattedTestResults, cwd: string, reportFile: string) {
+  let text: string | undefined;
+  if (reportFile) {
+    // TODO: add parsing of reportFile to make it markdown compliant
+    text = readFileSync(reportFile, "utf-8")
+  } else {
+    text = getOutputText(results)
+  }
+
   const payload: Octokit.ChecksCreateParams = {
     ...context.repo,
     head_sha: getSha(),
@@ -132,8 +143,8 @@ function getCheckPayload(results: FormattedTestResults, cwd: string) {
     status: "completed",
     conclusion: results.success ? "success" : "failure",
     output: {
-      title: results.success ? "Jest tests passed" : "Jest tests failed",
-      text: getOutputText(results),
+      title: results.success ? "Jest tests passed" : "Jest tests failed" + "\n Report File:" + getReportFile(),
+      text: text + "\n Report File:" + getReportFile(),
       summary: results.success
         ? `${results.numPassedTests} tests passing in ${
             results.numPassedTestSuites
@@ -160,6 +171,10 @@ function getJestCommand(resultsFile: string) {
   cmd += (isNpm ? " -- " : " ") + jestOptions
   core.debug("Final test command: " + cmd)
   return cmd
+}
+
+function getReportFile() : string {
+  return core.getInput("test-report", { required: false });
 }
 
 function parseResults(resultsFile: string): FormattedTestResults {
