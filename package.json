@@ -10,7 +10,7 @@
     "pack": "ncc build lib/run.js -m",
     "prepack": "npm run build",
     "failing-test": "jest failing-tests",
-    "test": "jest"
+    "test": "jest /tests/"
   },
   "repository": {
     "type": "git",
